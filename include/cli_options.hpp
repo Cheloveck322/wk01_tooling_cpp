@@ -11,13 +11,13 @@ const std::unordered_set<std::string_view> all_options{ "-h", "--help", "-w", "-
 
 struct Options
 {
-    std::size_t width{ 16 };
-    std::size_t limit{ 0 };
-    std::size_t offset{ 0 };
-    std::optional<std::string> file;
+    std::size_t _width{ 16 };
+    std::size_t _limit{ 0 };
+    std::size_t _offset{ 0 };
+    std::optional<std::string> _file;
 
     // validate code: 0 - --help/okay, 1 - wrong arguments/not implemented, 2 - I/O error
-    int validate() const; 
+    int validate() const;  // need to implement!!
 };
 
 Options parse_cli(int argc, char** argv);

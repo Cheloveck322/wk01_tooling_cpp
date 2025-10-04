@@ -6,6 +6,6 @@
 #include <span>
 #include <string>
 
-std::string format_line(std::uint64_t offset, std::span<const std::byte> data, std::size_t width);
+std::string hex_format_line(std::uint64_t offset, std::span<const std::byte> data, std::size_t width);
 
 #endif
