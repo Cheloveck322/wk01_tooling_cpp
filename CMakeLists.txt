@@ -8,7 +8,7 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 
 add_library(hexdumplib 
     src/hexfmt.cpp
-    src/args.cpp
+    src/cli_options.cpp
 )
 
 target_include_directories(hexdumplib PUBLIC ${CMAKE_SOURCE_DIR}/include)
