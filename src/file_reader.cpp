@@ -4,7 +4,7 @@
 #include <string>
 #include <unistd.h>
 
-File_Reader File_Reader::from_path(std::string_view path)
+File_Reader File_Reader::from_path(std::string_view path) noexcept
 {
     int fd = ::open(std::string(path).c_str() , O_RDONLY | O_CLOEXEC);
     if (fd < 0)
@@ -17,12 +17,18 @@ File_Reader File_Reader::from_path(std::string_view path)
     return File_Reader{ fd, true };
 }
 
-File_Reader File_Reader::from_stdin()
+File_Reader::File_Reader(std::string_view ch) noexcept
+{
+    File_Reader fp{ from_path(ch) };
+    File_Reader(fp);
+}
+
+File_Reader File_Reader::from_stdin() noexcept
 {
     return File_Reader{ STDIN_FILENO, false };
 }
 
-File_Reader::File_Reader(File_Reader&& other):
+File_Reader::File_Reader(File_Reader&& other) noexcept:
     _fd{ other._fd }, _owns_fd{ other._owns_fd }, _last_errno{ other._last_errno }, _last_op{ other._last_op }
 {
     other._fd = -1;
@@ -48,7 +54,7 @@ File_Reader& File_Reader::operator=(File_Reader&& other) noexcept
     return *this;
 }
 
-void File_Reader::close_file_if_needed() 
+void File_Reader::close_file_if_needed() noexcept
 {
     if (_fd >= 0 && _owns_fd)
     {
@@ -62,7 +68,7 @@ void File_Reader::close_file_if_needed()
     _owns_fd = false;
 }
 
-File_Reader::~File_Reader()
+File_Reader::~File_Reader() noexcept
 {
     close_file_if_needed();
 }

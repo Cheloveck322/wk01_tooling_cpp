@@ -34,6 +34,6 @@
         { "name": "build-release", "configurePreset": "release" }
     ],
     "testPresets": [
-        { "name": "test-debug", "configurePreset": "debug" }
+        { "name": "test-debug", "configurePreset": "debug", "output": {"outputOnFailure": true} }
     ]
 }

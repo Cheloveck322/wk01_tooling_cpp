@@ -13,11 +13,13 @@ public:
     static File_Reader from_stdin() noexcept;
 
     File_Reader() noexcept = default;
+    explicit File_Reader(std::string_view ch) noexcept;
+
     File_Reader(const File_Reader& file) = delete;
     File_Reader(File_Reader& file) = delete;
     File_Reader& operator=(const File_Reader& file) = delete;
 
-    File_Reader(File_Reader&& file);
+    File_Reader(File_Reader&& file) noexcept;
     File_Reader& operator=(File_Reader&& file) noexcept;
     ~File_Reader() noexcept;
 

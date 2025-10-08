@@ -15,9 +15,10 @@ struct Options
     std::size_t _limit{ 0 };
     std::size_t _offset{ 0 };
     std::optional<std::string> _file;
+    std::string _error;
 
     // validate code: 0 - --help/okay, 1 - wrong arguments/not implemented, 2 - I/O error
-    int is_validate() const; 
+    int validate() const; 
 };
 
 Options parse_cli(int argc, char** argv);

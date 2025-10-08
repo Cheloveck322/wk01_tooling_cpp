@@ -12,6 +12,12 @@ add_library(hexdumplib
     src/hex_formatter.cpp
 )
 
+add_library(tests
+    tests/cli_options_gtest.cpp
+    tests/file_reader_gtest.cpp
+    tests/hex_formatter_gtest.cpp
+)
+
 target_include_directories(hexdumplib PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 add_executable(hexdump-lite src/main.cpp)
