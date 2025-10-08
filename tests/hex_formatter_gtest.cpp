@@ -1,6 +1,6 @@
 // tests/hex_formatter_tests.cpp
 #include <gtest/gtest.h>
-#include "hex_formatter.hpp"
+#include "../include/hex_formatter.hpp"
 
 #include <vector>
 #include <span>

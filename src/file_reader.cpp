@@ -17,10 +17,9 @@ File_Reader File_Reader::from_path(std::string_view path) noexcept
     return File_Reader{ fd, true };
 }
 
-File_Reader::File_Reader(std::string_view ch) noexcept
+File_Reader::File_Reader(std::string_view ch) noexcept:
+    File_Reader(File_Reader::from_path(ch))
 {
-    File_Reader fp{ from_path(ch) };
-    File_Reader(fp);
 }
 
 File_Reader File_Reader::from_stdin() noexcept

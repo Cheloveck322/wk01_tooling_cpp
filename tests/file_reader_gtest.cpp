@@ -1,6 +1,6 @@
 // tests/file_reader_tests.cpp
 #include <gtest/gtest.h>
-#include "file_reader.hpp"
+#include "../include/file_reader.hpp"
 
 #include <filesystem>
 #include <fstream>
