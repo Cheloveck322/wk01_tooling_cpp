@@ -1,48 +1,126 @@
 #include "../include/file_reader.hpp"
+#include <cerrno>
+#include <fcntl.h>
+#include <string>
+#include <unistd.h>
 
-char* File_Reader::get_file_name() const
+File_Reader File_Reader::from_path(std::string_view path)
 {
-    return _file_name;
+    int fd = ::open(std::string(path).c_str() , O_RDONLY | O_CLOEXEC);
+    if (fd < 0)
+    {
+        File_Reader fd;
+        fd._last_errno = errno;
+        fd._last_op = "open";
+        return fd;
+    }
+    return File_Reader{ fd, true };
 }
 
-File_Reader::File_Reader(File_Reader&& other)
+File_Reader File_Reader::from_stdin()
 {
-    _input = std::move(other._input);
-    _file_name = std::move(other._file_name);
+    return File_Reader{ STDIN_FILENO, false };
+}
 
-    other._input.close();
-    other._file_name = nullptr;
+File_Reader::File_Reader(File_Reader&& other):
+    _fd{ other._fd }, _owns_fd{ other._owns_fd }, _last_errno{ other._last_errno }, _last_op{ other._last_op }
+{
+    other._fd = -1;
+    other._owns_fd = false;
+    other._last_errno = 0;
+    other._last_op = {};
 }
 
 File_Reader& File_Reader::operator=(File_Reader&& other) noexcept
 {
     if (this != &other)
     {
-        _input = std::move(other._input);
-        _file_name = std::move(other._file_name);
-
-        other._input.close();
-        other._file_name = nullptr;
+        close_file_if_needed();
+        _fd = other._fd;
+        _owns_fd = other._fd;
+        _last_errno = other._last_errno;
+        _last_op = other._last_op;
+        other._fd = -1;
+        other._owns_fd = false;
+        other._last_errno = 0;
+        other._last_op = {};
     }
     return *this;
 }
 
-bool File_Reader::is_open() const noexcept
+void File_Reader::close_file_if_needed() 
 {
-    return _input.is_open();
+    if (_fd >= 0 && _owns_fd)
+    {
+        if (::close(_fd) != 0)
+        {
+            _last_errno = errno;
+            _last_op = "close";
+        }
+    }
+    _fd = -1;
+    _owns_fd = false;
+}
+
+File_Reader::~File_Reader()
+{
+    close_file_if_needed();
 }
 
 size_t File_Reader::read_chunk(std::span<std::byte> out) noexcept
 {
-    return 0;
+    _last_errno = 0;
+    _last_op = {};
+    if (_fd < 0 || out.empty())
+    {
+        return 0;
+    }
+
+    const std::size_t to_read{ out.size() };
+    std::size_t total{ 0 };
+
+    for (;;)
+    {
+        ssize_t n{ ::read(_fd, out.data() + total, to_read - total) };
+        if (n > 0)
+        {
+            total += static_cast<std::size_t>(n);
+            break;
+        }
+        if (n == 0)
+        {
+            break;
+        }
+        if (errno == EINTR)
+        {
+            continue;
+        } 
+
+        _last_errno = errno;
+        _last_op = "read";
+
+        return 0;
+    }
+
+    return total;
 }
 
 bool File_Reader::seek(std::uint64_t offset) noexcept
 {
-    return false;
-}
+    _last_errno = 0;
+    _last_op = {};
 
-int File_Reader::native_handle() const noexcept
-{
-    return 1;   
+    if (_fd < 0)
+    {
+        return false;
+    }
+
+    off_t res{ ::lseek(_fd, static_cast<off_t>(offset), SEEK_SET) };
+    if (res == static_cast<off_t>(-1))
+    {
+        _last_errno = errno;
+        _last_op = "seek";
+        return false;
+    }
+    return true;
 }

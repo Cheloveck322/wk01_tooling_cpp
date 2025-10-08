@@ -17,7 +17,7 @@ struct Options
     std::optional<std::string> _file;
 
     // validate code: 0 - --help/okay, 1 - wrong arguments/not implemented, 2 - I/O error
-    int validate() const;  // need to implement!!
+    int is_validate() const; 
 };
 
 Options parse_cli(int argc, char** argv);

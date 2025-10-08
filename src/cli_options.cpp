@@ -67,3 +67,8 @@ void print_error_size(std::string_view prog, std::ostream& out)
 {
     out << "This command " << prog << " has to be >= 0\n";
 }
+
+int Options::is_validate() const
+{
+    
+}   
