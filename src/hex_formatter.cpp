@@ -2,19 +2,23 @@
 
 #include <cassert>
 
-namespace {
-constexpr char HEX[16] = {
+namespace 
+{
+constexpr char HEX[16] = 
+{
   '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'
 };
 
-inline bool is_printable(unsigned v) noexcept {
+inline bool is_printable(unsigned v) noexcept 
+{
   return v >= 0x20u && v <= 0x7Eu;
 }
 } // namespace
 
 std::string hex_format_line(std::uint64_t offset,
                         std::span<const std::byte> data,
-                        std::size_t width) {
+                        std::size_t width) 
+{
   // Простая защита контракта (можно заменить на precondition валидации выше по стеку)
   assert((width == 8u || width == 16u || width == 32u) && "width must be 8/16/32");
   assert(data.size() <= width && "data.size() must be <= width");

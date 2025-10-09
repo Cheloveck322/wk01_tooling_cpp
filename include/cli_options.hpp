@@ -9,21 +9,37 @@
 
 const std::unordered_set<std::string_view> all_options{ "-h", "--help", "-w", "--width", "-n", "--limit", "-o", "--offset" };
 
+class Validate
+{
+public: 
+    Validate() = default;
+    explicit Validate(int type_error) noexcept: _type_error{ type_error } {}
+
+    bool has_error() const noexcept { return _type_error > 0; }
+    std::string message() const noexcept;
+
+private:
+    int _type_error{}; // 
+};
+
 struct Options
 {
     std::size_t _width{ 16 };
     std::size_t _limit{ 1000 };
     std::size_t _offset{ 0 };
     std::optional<std::string> _file;
-    std::string _error;
-
-    // validate code: 0 - --help/okay, 1 - wrong arguments/not implemented, 2 - I/O error
-    int validate() const; 
+    int _error;
+    bool _show_help{ false };
+    
+    Validate validate() const; 
+   
 };
 
-Options parse_cli(int argc, char** argv);
-void print_help(std::string_view prog, std::ostream& out);
-void print_error_width(std::ostream& out);
-void print_error_size(std::string_view prog, std::ostream& out);
+namespace Option
+{
+    Options parse_args(int argc, char** argv);
+    void print_help(std::string_view prog, std::ostream& out);
+}
+
 
 #endif

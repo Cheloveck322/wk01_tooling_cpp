@@ -1,7 +1,7 @@
 #include "../include/cli_options.hpp"
 #include <iostream>
 
-Options parse_cli(int argc, char** argv)
+Options Option::parse_args(int argc, char** argv)
 {
     Options opt;
     for (int i = 1; i < argc; ++i)
@@ -9,7 +9,7 @@ Options parse_cli(int argc, char** argv)
         std::string option{ argv[i] };
         if (option == "-h" || option == "--help")
         {
-            print_help(argv[i], std::cout);
+            opt._show_help = true;
             std::exit(0);
         }
         else if (option == "-w" || option == "--width")
@@ -17,7 +17,8 @@ Options parse_cli(int argc, char** argv)
             size_t new_width{ static_cast<size_t>(std::stoull(argv[++i])) };
             if (!(new_width == 8 || new_width == 16 || new_width == 32)) 
             {
-                std::cerr << "Width must be 8, 16, or 32\n"; std::exit(1);
+                opt._error = 1;
+                std::exit(1);
             }
             else 
             {
@@ -34,8 +35,8 @@ Options parse_cli(int argc, char** argv)
         }
         else if (option.rfind("-", 0) != std::string::npos)
         {
-            std::cerr << "Unknown option: " << option << std::endl;
-            print_help(argv[1], std::cout);
+            opt._error = 1;
+            std::exit(1);
         }
         else 
         {
@@ -46,7 +47,7 @@ Options parse_cli(int argc, char** argv)
     return opt;
 }
 
-void print_help(std::string_view prog, std::ostream& out)
+void Option::print_help(std::string_view prog, std::ostream& out)
 {
     out << 
         "Usage: " << prog << "\thexdump-lite [options] <_file>...\n"
@@ -58,17 +59,22 @@ void print_help(std::string_view prog, std::ostream& out)
         "  -h, --help              show this help\n";
 }
 
-void print_error_width(std::ostream& out)
+Validate Options::validate() const
 {
-    out << "Width must be 8, 16, or 32\n";
-}
+    Validate valid{ _error };
 
-void print_error_size(std::string_view prog, std::ostream& out)
-{
-    out << "This command " << prog << " has to be >= 0\n";
-}
-
-int Options::validate() const
-{
-    
+    return valid;
 }   
+
+std::string Validate::message() const noexcept
+{
+    switch (_type_error)
+    {
+    case 1:
+        return "Invalid arguments error occurs. Pls try --help.";
+    
+    default:
+        return "I/O file error occurs, pls try --help.\n";
+    }
+    return "";
+}
